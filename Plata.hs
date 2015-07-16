@@ -20,10 +20,10 @@ data Player = Player { spawn :: (GLfloat,GLfloat),
                        rad :: GLfloat,
                        fv :: [FVector] } deriving (Show,Eq)
 
-accel = 0.015 -- base speed of acceleration
+accel = 0.055 -- base speed of acceleration
 decay = 0.15 -- base decay of Input force vectors.
 
-grav = 0.001
+grav = 0.025
 
 initGL win = do
   glShadeModel gl_SMOOTH

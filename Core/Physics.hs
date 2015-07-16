@@ -14,7 +14,7 @@ inputVectors xt fv =
        Just a -> (FVector ((f a) + xt) (dir a) (typ a)):(filter (\x -> (dir x) /= (dir a)) fv)
        Nothing -> fv
 
-appVecs op fv l = foldr (+) l (map (\x -> (op $ dir x)*2*pi*(f x)) fv)
+appVecs op fv l = foldr (+) l (map (\x -> (op $ dir x)*(f x)) fv)
 
 cleanUp fv = map (\x -> FVector (if (f x) < 0 then 0 else (f x)) (dir x) (typ x)) fv
 applyDecay d r fv =
@@ -37,7 +37,6 @@ addVect v fv =
 -- remove vector by direction
 remVect d = filter (/= d)
 
-remVF fv = --[FVector (foldr (+) 0 (map (\x -> (cos $ dir x)*2*pi*(f x)) fv)) 0 Input]
-  case find (\x -> (typ x) == Input) fv of
-       Just a -> [a]
-       Nothing -> fv
+remVF fv = [FVector (foldr (+) 0 (map (\x -> (cos $ dir x)*(f x)) fv)) 0 Input]
+--remVF fv = [FVector (foldr (+) 0 (map (\x -> (cos $ dir x)*(f x)) fv)) 0 Input,
+--            FVector (foldr (-) 0 (map (\y -> (sin $ dir y)*(f y)/3) fv)) (pi/2) Collision]
