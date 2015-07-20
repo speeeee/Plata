@@ -1,6 +1,14 @@
-module Core.Hitbox (testLine,testLineY,testLineX,Line(..)) where
+module Core.Hitbox (testLine,testLineY,testLineX,Line(..),pHit,Player(..)) where
 
 import Graphics.Rendering.OpenGL.Raw
+
+import Core.Physics
+
+
+data Player = Player { spawn :: (GLfloat,GLfloat),
+                       pos :: (GLfloat,GLfloat),
+                       rad :: GLfloat,
+                       fv :: [FVector] } deriving (Show,Eq)
 
 data Line = Line { pta :: (GLfloat,GLfloat),
                    ptb :: (GLfloat,GLfloat) } deriving (Show,Eq)
@@ -15,3 +23,10 @@ testLine p p' xy bnd l =
 
 testLineY p p' = testLine p p' snd fst
 testLineX p p' = testLine p p' fst snd
+
+pHit sp (x,y) (x',y') ln fv =
+  let fv' = applyDecay decay 0 $ remVF fv in
+  if testLineY (x,y) (x',y') ln
+  then Player sp (appVecs cos fv' x,4) 0 fv'
+  else Player sp (x',y') 0
+              (addVect (FVector grav (3*pi/2) Gravity) fv)

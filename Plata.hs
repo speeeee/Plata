@@ -16,17 +16,7 @@ import Core.Hitbox
    -30.0 30.0 -30.0 30.0 -30.0 30.0 glOrtho
    GL_MODELVIEW glMatrixMode ;-}
 
-data Player = Player { spawn :: (GLfloat,GLfloat),
-                       pos :: (GLfloat,GLfloat),
-                       rad :: GLfloat,
-                       fv :: [FVector] } deriving (Show,Eq)
-
 ln = Line (3,4) (30,4)
-
-accel = 0.055 -- base speed of acceleration
-decay = 0.15 -- base decay of Input force vectors.
-
-grav = 0.025
 
 initGL win = do
   glShadeModel gl_SMOOTH
@@ -47,7 +37,10 @@ drawScene player _ = do
   glLoadIdentity
   glTranslatef (-30) (-30) 0
   glBegin gl_QUADS
+  glColor3f 1 1 1
   mapM_ (\(x,y,z) -> glVertex3f x y z) [(x,y,0),(x+1,y,0),(x+1,y+1.6,0),(x,y+1.6,0)]
+  glColor3f 1 0 0
+  mapM_ (\(x,y,z) -> glVertex3f x y z) [(3,0,0),(3,4,0),(30,4,0),(30,0,0)]
   glEnd
 
 shutdown :: K.Window -> IO ()
@@ -83,10 +76,11 @@ processInput player win = do
              inputVectors (xi*accel) $ fv player
       fv'' = applyDecay decay (rad player) $ remVF fv'
   putStrLn (show fv')
-  return (if {-y' <= 4-} testLineY (x,y) (x',y') ln
+  {-return (if testLineY (x,y) (x',y') ln
             then (Player (spawn player) (appVecs cos fv'' x,4) (rad player) fv'')
             else (Player (spawn player) (x',y') (rad player)
-                         (addVect (FVector grav (3*pi/2) Gravity) fv')))
+                         (addVect (FVector grav (3*pi/2) Gravity) fv')))-}
+  return (pHit (spawn player) (x,y) (x',y') ln fv')
 
 runGame player win = runGame' player win (0::Int)
 runGame' player win acc = do

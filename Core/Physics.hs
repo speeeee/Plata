@@ -1,4 +1,5 @@
-module Core.Physics (FVector(..), FVType(..), addVect, appVecs, applyDecay, cleanUp, inputVectors, remVF) where
+module Core.Physics (FVector(..), FVType(..), addVect, appVecs, applyDecay, cleanUp, inputVectors, remVF,
+                     accel,decay,grav) where
 
 import Graphics.Rendering.OpenGL.Raw
 import Data.List
@@ -7,6 +8,11 @@ data FVType = Input | Collision | Gravity deriving (Eq, Show)
 data FVector = FVector { f :: GLfloat,
                          dir :: GLfloat, -- degrees from east; counter-clockwise
                          typ :: FVType } deriving (Show,Eq)
+
+accel = (0.055::GLfloat) -- base speed of acceleration
+decay = (0.15::GLfloat) -- base decay of Input force vectors.
+
+grav = (0.025::GLfloat)
 
 inputVectors xt fv =
   let d = find (\x -> (dir x) == 0) fv in
