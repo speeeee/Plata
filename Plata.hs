@@ -17,6 +17,8 @@ import Core.Hitbox
    GL_MODELVIEW glMatrixMode ;-}
 
 ln = Line (3,4) (30,4)
+ln2 = Line (24,4) (24,10)
+ln3 = Line (24,10) (30,10)
 
 initGL win = do
   glShadeModel gl_SMOOTH
@@ -40,7 +42,8 @@ drawScene player _ = do
   glColor3f 1 1 1
   mapM_ (\(x,y,z) -> glVertex3f x y z) [(x,y,0),(x+1,y,0),(x+1,y+1.6,0),(x,y+1.6,0)]
   glColor3f 1 0 0
-  mapM_ (\(x,y,z) -> glVertex3f x y z) [(3,0,0),(3,4,0),(30,4,0),(30,0,0)]
+  mapM_ (\(x,y,z) -> glVertex3f x y z) [(4,0,0),(4,4,0),(30,4,0),(30,0,0),
+                                        (25,4,0),(25,10,0),(30,10,0),(30,4,0)]
   glEnd
 
 shutdown :: K.Window -> IO ()
@@ -74,13 +77,10 @@ processInput player win = do
       (x',y') = (appVecs cos fv' x, appVecs sin fv' y)
       fv' =  {-addVect (FVector grav (3*pi/2) Gravity) $ applyDecay decay (rad player) $-}
              inputVectors (xi*accel) $ fv player
-      fv'' = applyDecay decay (rad player) $ remVF fv'
+      p = pHitY (spawn player) (x,y) (x',y') ln fv'
+      --p' = pHitY (spawn player) (x,y) (pos p) ln3 (fv p)
   putStrLn (show fv')
-  {-return (if testLineY (x,y) (x',y') ln
-            then (Player (spawn player) (appVecs cos fv'' x,4) (rad player) fv'')
-            else (Player (spawn player) (x',y') (rad player)
-                         (addVect (FVector grav (3*pi/2) Gravity) fv')))-}
-  return (pHit (spawn player) (x,y) (x',y') ln fv')
+  return (pHitX (spawn player) (x,y) (pos p) ln2 (fv p))
 
 runGame player win = runGame' player win (0::Int)
 runGame' player win acc = do
