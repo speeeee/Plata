@@ -24,7 +24,7 @@ testLine p p' xy bnd l =
 testLineY p p' = testLine p p' snd fst
 testLineX p p' = testLine p p' fst snd
 
-pHitY sp (x,y) (x',y') ln fv =
+pHitY sp (x,y) (x',y') ln grav fv =
   let fv' = applyDecay decay 0 $ remVF fv in
   if testLineY (x,y) (x',y') ln
   then Player sp (appVecs cos fv' x,snd $ pta ln) 0 fv'

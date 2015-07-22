@@ -1,5 +1,5 @@
 module Core.Physics (FVector(..), FVType(..), addVect, appVecs, applyDecay, cleanUp, inputVectors, remVF,
-                     accel,decay,grav) where
+                     accel,decay) where
 
 import Graphics.Rendering.OpenGL.Raw
 import Data.List
@@ -11,8 +11,6 @@ data FVector = FVector { f :: GLfloat,
 
 accel = (0.055::GLfloat) -- base speed of acceleration
 decay = (0.15::GLfloat) -- base decay of Input force vectors.
-
-grav = (0.025::GLfloat)
 
 inputVectors xt fv =
   let d = find (\x -> (dir x) == 0) fv in

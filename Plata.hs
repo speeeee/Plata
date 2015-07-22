@@ -20,6 +20,8 @@ ln = Line (3,4) (30,4)
 ln2 = Line (24,4) (24,10)
 ln3 = Line (24,10) (30,10)
 
+grav = (0.025::GLfloat)/2 -- amt of x = n sloped hitboxes.
+
 initGL win = do
   glShadeModel gl_SMOOTH
   glClearColor 0 0 0 0
@@ -77,10 +79,10 @@ processInput player win = do
       (x',y') = (appVecs cos fv' x, appVecs sin fv' y)
       fv' =  {-addVect (FVector grav (3*pi/2) Gravity) $ applyDecay decay (rad player) $-}
              inputVectors (xi*accel) $ fv player
-      p = pHitY (spawn player) (x,y) (x',y') ln fv'
-      --p' = pHitY (spawn player) (x,y) (pos p) ln3 (fv p)
+      p = pHitY (spawn player) (x,y) (x',y') ln grav fv'
+      p' = pHitY (spawn player) (x,y) (pos p) ln3 grav (fv p)
   putStrLn (show fv')
-  return (pHitX (spawn player) (x,y) (pos p) ln2 (fv p))
+  return (pHitX (spawn player) (x,y) (pos p') ln2 (fv p'))
 
 runGame player win = runGame' player win (0::Int)
 runGame' player win acc = do
