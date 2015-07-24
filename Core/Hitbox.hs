@@ -24,12 +24,12 @@ testLine p p' xy bnd l =
 testLineY p p' = testLine p p' snd fst
 testLineX p p' = testLine p p' fst snd
 
-pHitY sp (x,y) (x',y') ln grav fv =
+pHitY tf sp (x,y) (x',y') ln grav fv =
   let fv' = applyDecay decay 0 $ remVF fv in
   if testLineY (x,y) (x',y') ln
-  then Player sp (appVecs cos fv' x,snd $ pta ln) 0 fv'
-  else Player sp (x',y') 0
-                 (addVect (FVector grav (3*pi/2) Gravity) fv)
+  then (True, Player sp (appVecs cos fv' x,snd $ pta ln) 0 fv')
+  else (tf, Player sp (x',y') 0
+            {-(addVect (FVector grav (3*pi/2) Gravity) fv)-} fv)
 
 
 pHitX sp (x,y) (x',y') ln fv =

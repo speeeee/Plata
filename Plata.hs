@@ -19,8 +19,9 @@ import Core.Hitbox
 ln = Line (3,4) (30,4)
 ln2 = Line (24,4) (24,10)
 ln3 = Line (24,10) (30,10)
+ln4 = Line (0,22) (10,22)
 
-grav = (0.025::GLfloat)/2 -- amt of x = n sloped hitboxes.
+grav = (0.025::GLfloat) -- amt of x = n sloped hitboxes.
 
 initGL win = do
   glShadeModel gl_SMOOTH
@@ -79,10 +80,13 @@ processInput player win = do
       (x',y') = (appVecs cos fv' x, appVecs sin fv' y)
       fv' =  {-addVect (FVector grav (3*pi/2) Gravity) $ applyDecay decay (rad player) $-}
              inputVectors (xi*accel) $ fv player
-      p = pHitY (spawn player) (x,y) (x',y') ln grav fv'
-      p' = pHitY (spawn player) (x,y) (pos p) ln3 grav (fv p)
+      (t,p) = pHitY False (spawn player) (x,y) (x',y') ln grav fv'
+      (t',p') = pHitY t (spawn player) (x,y) (pos p) ln3 grav (fv p)
+      (t'',p'') = pHitY t' (spawn player) (x,y) (pos p') ln4 grav (fv p')
   putStrLn (show fv')
-  return (pHitX (spawn player) (x,y) (pos p') ln2 (fv p'))
+  return (pHitX (spawn player) (x,y) (pos p'') ln2
+                (if not t'' then addVect (FVector grav (3*pi/2) Gravity) (fv p'')
+                            else fv p''))
 
 runGame player win = runGame' player win (0::Int)
 runGame' player win acc = do
