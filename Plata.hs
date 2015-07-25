@@ -79,14 +79,14 @@ processInput player win = do
   let (x,y) = pos player
       (x',y') = (appVecs cos fv' x, appVecs sin fv' y)
       fv' =  {-addVect (FVector grav (3*pi/2) Gravity) $ applyDecay decay (rad player) $-}
-             inputVectors (xi*accel) $ fv player
-      (t,p) = pHitY False (spawn player) (x,y) (x',y') ln grav fv'
-      (t',p') = pHitY t (spawn player) (x,y) (pos p) ln3 grav (fv p)
-      (t'',p'') = pHitY t' (spawn player) (x,y) (pos p') ln4 grav (fv p')
+             inputVectors (if (st player) == Air then (xi*accel)/10 else xi*accel) $ fv player
+      p = pHitY Air (spawn player) (x,y) (x',y') ln grav fv'
+      p' = pHitY (st p) (spawn player) (x,y) (pos p) ln3 grav (fv p)
+      p'' = pHitY (st p') (spawn player) (x,y) (pos p') ln4 grav (fv p')
   putStrLn (show fv')
-  return (pHitX (spawn player) (x,y) (pos p'') ln2
-                (if not t'' then addVect (FVector grav (3*pi/2) Gravity) (fv p'')
-                            else fv p''))
+  return (pHitX (st p'') (spawn player) (x,y) (pos p'') ln2
+                (if st p'' == Air then addVect (FVector grav (3*pi/2) Gravity) (fv p'')
+                                  else fv p''))
 
 runGame player win = runGame' player win (0::Int)
 runGame' player win acc = do
@@ -99,7 +99,7 @@ runGame' player win acc = do
 main = do
   True <- K.init
   Just win <- K.createWindow 1280 800 "plata" Nothing Nothing
-  let player = Player (0,58) (0,58) 1 [(FVector 0 0 Input)]
+  let player = Player (0,58) (0,58) 1 [(FVector 0 0 Input)] None
   K.makeContextCurrent (Just win)
   K.setWindowRefreshCallback win (Just (drawScene player))
   K.setFramebufferSizeCallback win (Just resizeScene)

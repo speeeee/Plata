@@ -1,14 +1,15 @@
-module Core.Hitbox (testLine,testLineY,testLineX,Line(..),pHitY,pHitX,Player(..)) where
+module Core.Hitbox (testLine,testLineY,testLineX,Line(..),pHitY,pHitX,Player(..),PState(..)) where
 
 import Graphics.Rendering.OpenGL.Raw
 
 import Core.Physics
 
-
+data PState = Ground | Air | None deriving (Show,Eq)
 data Player = Player { spawn :: (GLfloat,GLfloat),
                        pos :: (GLfloat,GLfloat),
                        rad :: GLfloat,
-                       fv :: [FVector] } deriving (Show,Eq)
+                       fv :: [FVector],
+                       st :: PState } deriving (Show,Eq)
 
 data Line = Line { pta :: (GLfloat,GLfloat),
                    ptb :: (GLfloat,GLfloat) } deriving (Show,Eq)
@@ -27,12 +28,12 @@ testLineX p p' = testLine p p' fst snd
 pHitY tf sp (x,y) (x',y') ln grav fv =
   let fv' = applyDecay decay 0 $ remVF fv in
   if testLineY (x,y) (x',y') ln
-  then (True, Player sp (appVecs cos fv' x,snd $ pta ln) 0 fv')
-  else (tf, Player sp (x',y') 0
-            {-(addVect (FVector grav (3*pi/2) Gravity) fv)-} fv)
+  then Player sp (appVecs cos fv' x,snd $ pta ln) 0 fv' Ground
+  else Player sp (x',y') 0
+       {-(addVect (FVector grav (3*pi/2) Gravity) fv)-} fv tf
 
 
-pHitX sp (x,y) (x',y') ln fv =
+pHitX tf sp (x,y) (x',y') ln fv =
   if testLineX (x,y) (x',y') ln
-  then Player sp ((fst $ pta ln)-0.001,y') 0 fv
-  else Player sp (x',y') 0 fv
+  then Player sp ((fst $ pta ln)-0.001,y') 0 fv tf
+  else Player sp (x',y') 0 fv tf
