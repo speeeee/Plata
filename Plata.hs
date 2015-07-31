@@ -23,6 +23,9 @@ ln4 = Line (0,22) (10,22)
 
 grav = (0.025::GLfloat) -- amt of x = n sloped hitboxes.
 
+yLns = [Line (3,4) (30,4), Line (0,22) (10,22), Line (24,10) (30,10)]
+xLns = [Line (24,4) (24,10)]
+
 initGL win = do
   glShadeModel gl_SMOOTH
   glClearColor 0 0 0 0
@@ -80,9 +83,10 @@ processInput player win = do
       (x',y') = (appVecs cos fv' x, appVecs sin fv' y)
       fv' =  {-addVect (FVector grav (3*pi/2) Gravity) $ applyDecay decay (rad player) $-}
              inputVectors (if (st player) == Air then (xi*accel)/10 else xi*accel) $ fv player
-      p = pHitY Air (spawn player) (x,y) (x',y') ln grav fv'
+      {-p = pHitY Air (spawn player) (x,y) (x',y') ln grav fv'
       p' = pHitY (st p) (spawn player) (x,y) (pos p) ln3 grav (fv p)
-      p'' = pHitY (st p') (spawn player) (x,y) (pos p') ln4 grav (fv p')
+      p'' = pHitY (st p') (spawn player) (x,y) (pos p') ln4 grav (fv p')-}
+      p'' = testLinesY (x,y) (Player (spawn player) (x',y') 0 fv' Air) grav yLns
   putStrLn (show fv')
   return (pHitX (st p'') (spawn player) (x,y) (pos p'') ln2
                 (if st p'' == Air then addVect (FVector grav (3*pi/2) Gravity) (fv p'')
@@ -99,7 +103,7 @@ runGame' player win acc = do
 main = do
   True <- K.init
   Just win <- K.createWindow 1280 800 "plata" Nothing Nothing
-  let player = Player (0,58) (0,58) 1 [(FVector 0 0 Input)] None
+  let player = Player (0,58) (0,58) 1 [(FVector 0 0 Input)] Air
   K.makeContextCurrent (Just win)
   K.setWindowRefreshCallback win (Just (drawScene player))
   K.setFramebufferSizeCallback win (Just resizeScene)
