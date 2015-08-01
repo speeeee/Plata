@@ -1,5 +1,5 @@
 module Core.Hitbox (testLine,testLineY,testLineX,Line(..),pHitY,pHitX,Player(..),PState(..),
-                    hbToLs,testLinesY) where
+                    hbToLs,testLinesY,testLinesX) where
 
 import Graphics.Rendering.OpenGL.Raw
 
@@ -25,8 +25,10 @@ hbToLs hb = ([Line (fst $ pa hb, snd $ pa hb) (fst $ pb hb, snd $ pa hb),
               Line (fst $ pb hb, snd $ pa hb) (fst $ pb hb, snd $ pb hb)])
 
 testLinesY o p grav = foldl (hitY o grav) p
-
 hitY o grav p ln = pHitY (st p) (spawn p) o (fst $ pos p, snd $ pos p) ln grav (fv p)
+
+testLinesX o = foldl (hitX o)
+hitX o p ln = pHitX (st p) (spawn p) o (fst $ pos p, snd $ pos p) ln (fv p)
 
 -- will only work with points with slope = [real] or slope = infinity.
 -- `xy' works as a test for which slope.

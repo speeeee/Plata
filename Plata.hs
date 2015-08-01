@@ -85,12 +85,16 @@ processInput player win = do
              inputVectors (if (st player) == Air then (xi*accel)/10 else xi*accel) $ fv player
       {-p = pHitY Air (spawn player) (x,y) (x',y') ln grav fv'
       p' = pHitY (st p) (spawn player) (x,y) (pos p) ln3 grav (fv p)
-      p'' = pHitY (st p') (spawn player) (x,y) (pos p') ln4 grav (fv p')-}
-      p'' = testLinesY (x,y) (Player (spawn player) (x',y') 0 fv' Air) grav yLns
+      p'' = pHitY (st p') (spawn player) (x,y) (pos p') ln4 grav (fv p')
+      p'' = testLinesY (x,y) (Player (spawn player) (x',y') 0 fv' Air) grav yLns-}
+      p'' = testLinesX (x,y) (testLinesY (x,y) (Player (spawn player) (x',y') 0 fv' Air) grav yLns) xLns
   putStrLn (show fv')
-  return (pHitX (st p'') (spawn player) (x,y) (pos p'') ln2
+  {-return (pHitX (st p'') (spawn player) (x,y) (pos p'') ln2
                 (if st p'' == Air then addVect (FVector grav (3*pi/2) Gravity) (fv p'')
-                                  else fv p''))
+                                  else fv p''))-}
+  return (Player (spawn player) (pos p'') 0
+                 (if st p'' == Air then addVect (FVector grav (3*pi/2) Gravity) (fv p'')
+                                  else fv p'') (st p''))
 
 runGame player win = runGame' player win (0::Int)
 runGame' player win acc = do
