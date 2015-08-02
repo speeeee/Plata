@@ -64,21 +64,22 @@ isPressed K.KeyState'Pressed = True
 isPressed K.KeyState'Repeating = True
 isPressed _ = False
 
-getInput :: K.Window -> IO (GLfloat, GLfloat)
+getInput :: K.Window -> IO (GLfloat, GLfloat, Bool)
 getInput win = do
   x0 <- isPressed `fmap` K.getKey win K.Key'Left
   x1 <- isPressed `fmap` K.getKey win K.Key'Right
   y0 <- isPressed `fmap` K.getKey win K.Key'Down
   y1 <- isPressed `fmap` K.getKey win K.Key'Up
+  j <- isPressed `fmap` K.getKey win K.Key'Space
   let x0n = if x0 then -1 else 0
       x1n = if x1 then 1 else 0
       y0n = if y0 then -1 else 0
       y1n = if y1 then 1 else 0
-  return (x0n + x1n, y0n + y1n)
+  return (x0n + x1n, y0n + y1n, j)
 
 processInput :: Player -> K.Window -> IO Player
 processInput player win = do
-  (xi, yi) <- liftIO $ getInput win
+  (xi, yi, j) <- liftIO $ getInput win
   let (x,y) = pos player
       (x',y') = (appVecs cos fv' x, appVecs sin fv' y)
       fv' =  {-addVect (FVector grav (3*pi/2) Gravity) $ applyDecay decay (rad player) $-}
@@ -92,9 +93,9 @@ processInput player win = do
   {-return (pHitX (st p'') (spawn player) (x,y) (pos p'') ln2
                 (if st p'' == Air then addVect (FVector grav (3*pi/2) Gravity) (fv p'')
                                   else fv p''))-}
-  return (Player (spawn player) (pos p'') 0
+  return (Player (spawn player) (fst $ pos p'', if j && st p'' == Ground then snd (pos p'')+0.5 else snd $ pos p'') 0
                  (if st p'' == Air then addVect (FVector grav (3*pi/2) Gravity) (fv p'')
-                                  else fv p'') (st p''))
+                                   else if j then addVect (FVector 1.0 (pi/2) Input) (fv p'') else fv p'') (st p''))
 
 runGame player win = runGame' player win (0::Int)
 runGame' player win acc = do
