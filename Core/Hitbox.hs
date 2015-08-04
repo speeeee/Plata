@@ -51,5 +51,5 @@ pHitY tf sp (x,y) (x',y') ln grav fv =
 
 pHitX tf sp (x,y) (x',y') ln fv =
   if testLineX (x,y) (x',y') ln
-  then Player sp ((fst $ pta ln)-0.001,y') 0 fv tf
+  then Player sp ((fst $ pta ln)-0.001,y') 0 (chHF fv) tf
   else Player sp (x',y') 0 fv tf

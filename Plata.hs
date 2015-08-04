@@ -24,7 +24,7 @@ ln4 = Line (0,22) (10,22)
 grav = (0.025::GLfloat) -- amt of x = n sloped hitboxes.
 
 yLns = [Line (3,4) (30,4), Line (0,22) (10,22), Line (24,10) (30,10)]
-xLns = [Line (24,4) (24,10)]
+xLns = [Line (24,4) (24,9.99)]
 
 initGL win = do
   glShadeModel gl_SMOOTH
@@ -93,9 +93,13 @@ processInput player win = do
   {-return (pHitX (st p'') (spawn player) (x,y) (pos p'') ln2
                 (if st p'' == Air then addVect (FVector grav (3*pi/2) Gravity) (fv p'')
                                   else fv p''))-}
+  --putStrLn $ show $ exstV JInput (fv p'')
   return (Player (spawn player) (fst $ pos p'', if j && st p'' == Ground then snd (pos p'')+0.5 else snd $ pos p'') 0
-                 (if st p'' == Air then addVect (FVector grav (3*pi/2) Gravity) (fv p'')
-                                   else if j then addVect (FVector 1.0 (pi/2) Input) (fv p'') else fv p'') (st p''))
+                 (if st p'' == Air then if exstV JInput (fv p'') && not j
+                                        then opVect (*) (FVector 0.95 (pi/2) JInput) $ addVect (FVector grav (3*pi/2) Gravity) (fv p'')
+                                        else addVect (FVector grav (3*pi/2) Gravity) (fv p'')
+                                   else if j then addVect (FVector 0.6 (pi/2) JInput) (fv p'')
+                                   else fv p'') (st p''))
 
 runGame player win = runGame' player win (0::Int)
 runGame' player win acc = do

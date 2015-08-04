@@ -1,10 +1,10 @@
 module Core.Physics (FVector(..), FVType(..), addVect, appVecs, applyDecay, cleanUp, inputVectors, remVF,
-                     remByTyp,accel,decay,chk) where
+                     chHF,remByTyp,accel,exstV,decay,opVect) where
 
 import Graphics.Rendering.OpenGL.Raw
 import Data.List
 
-data FVType = Input | Collision | Gravity | GravityInit deriving (Eq, Show)
+data FVType = Input | Collision | Gravity | JInput deriving (Eq, Show)
 data FVector = FVector { f :: GLfloat,
                          dir :: GLfloat, -- degrees from east; counter-clockwise
                          typ :: FVType } deriving (Show,Eq)
@@ -12,7 +12,7 @@ data FVector = FVector { f :: GLfloat,
 accel = (0.055::GLfloat) -- base speed of acceleration
 decay = (0.15::GLfloat) -- base decay of Input force vectors.
 
-chk = (\x -> (typ x) == GravityInit)
+--chk = (\x -> (typ x) == GravityInit)
 
 inputVectors xt fv =
   let d = find (\x -> (dir x) == 0) fv in
@@ -39,11 +39,16 @@ addVect v fv =
   case find (\x -> (dir x) == (dir v)) fv of
        Just a -> (FVector ((f a) + (f v)) (dir a) (typ a)):(filter (\x -> (dir x) /= (dir v)) fv)
        Nothing -> v:fv
+opVect o v = map (\x -> if (dir x) == (dir v) then FVector ((f x) `o` (f v)) (dir x) (typ x) else x)
 
 -- remove vector by direction
 remVect d = filter (/= d)
 remByTyp t = filter (\x -> (typ x) /= t)
 
 remVF fv = [FVector (foldr (+) 0 (map (\x -> (cos $ dir x)*(f x)) fv)) 0 Input]
+chHF = --map (\x -> FVector ((cos $ dir x)*(f x)/(3)+(sin $ dir x)*(f x)) (dir x) (typ x))
+       map (\x -> if typ x == Input then FVector ((dir x)/(-3)) (dir x) (typ x) else x)
 --remVF fv = [FVector (foldr (+) 0 (map (\x -> (cos $ dir x)*(f x)) fv)) 0 Input,
 --            FVector (foldr (-) 0 (map (\y -> (sin $ dir y)*(f y)/3) fv)) (pi/2) Collision]
+
+exstV t = any (\k -> ((==) . typ) k t)
