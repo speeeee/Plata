@@ -1,5 +1,5 @@
 module Core.Hitbox (testLine,testLineY,testLineX,Line(..),pHitY,pHitX,Player(..),PState(..),
-                    hbToLs,testLinesY,testLinesX) where
+                    hbToLs,testLinesY,testLinesX,chkJmps) where
 
 import Graphics.Rendering.OpenGL.Raw
 
@@ -8,8 +8,7 @@ import Core.Physics
 data PState = Ground | Air | None deriving (Show,Eq)
 data Player = Player { spawn :: (GLfloat,GLfloat),
                        pos :: (GLfloat,GLfloat),
-                       rad :: GLfloat,
-                       fv :: [FVector],
+                       rad :: GLfloat, fv :: [FVector],
                        st :: PState } deriving (Show,Eq)
 
 data Line = Line { pta :: (GLfloat,GLfloat),
@@ -53,3 +52,10 @@ pHitX tf sp (x,y) (x',y') ln fv =
   if testLineX (x,y) (x',y') ln
   then Player sp ((fst $ pta ln)-0.001,y') 0 (chHF fv) tf
   else Player sp (x',y') 0 fv tf
+
+chkJmps p lj j =
+  if st p == Air then if exstV JInput (fv p) && not j
+    then opVect (*) (FVector 0.95 (pi/2) JInput) $ addVect (FVector grav (3*pi/2) Gravity) (fv p)
+    else addVect (FVector grav (3*pi/2) Gravity) (fv p)
+  else if j then addVect (FVector 0.6 (pi/2) JInput) (fv p)
+  else fv p

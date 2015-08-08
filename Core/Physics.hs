@@ -1,5 +1,5 @@
 module Core.Physics (FVector(..), FVType(..), addVect, appVecs, applyDecay, cleanUp, inputVectors, remVF,
-                     chHF,remByTyp,accel,exstV,decay,opVect) where
+                     chHF,remByTyp,accel,grav,exstV,decay,opVect) where
 
 import Graphics.Rendering.OpenGL.Raw
 import Data.List
@@ -9,8 +9,9 @@ data FVector = FVector { f :: GLfloat,
                          dir :: GLfloat, -- degrees from east; counter-clockwise
                          typ :: FVType } deriving (Show,Eq)
 
-accel = (0.055::GLfloat) -- base speed of acceleration
+accel = (0.045::GLfloat) -- base speed of acceleration
 decay = (0.15::GLfloat) -- base decay of Input force vectors.
+grav = (0.025::GLfloat)
 
 --chk = (\x -> (typ x) == GravityInit)
 

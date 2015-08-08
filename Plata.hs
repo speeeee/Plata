@@ -21,8 +21,6 @@ ln2 = Line (24,4) (24,10)
 ln3 = Line (24,10) (30,10)
 ln4 = Line (0,22) (10,22)
 
-grav = (0.025::GLfloat) -- amt of x = n sloped hitboxes.
-
 yLns = [Line (3,4) (30,4), Line (0,22) (10,22), Line (24,10) (30,10)]
 xLns = [Line (24,4) (24,9.99)]
 
@@ -43,7 +41,8 @@ drawScene player _ = do
   glClear $ fromIntegral $ gl_COLOR_BUFFER_BIT .|. gl_DEPTH_BUFFER_BIT
   let (x, y) = pos player
   glLoadIdentity
-  glTranslatef (-30) (-30) 0
+  --glTranslatef (-30) (-30) 0
+  glTranslatef (-x) (-y) 0
   glBegin gl_QUADS
   glColor3f 1 1 1
   mapM_ (\(x,y,z) -> glVertex3f x y z) [(x,y,0),(x+1,y,0),(x+1,y+1.6,0),(x,y+1.6,0)]
@@ -77,8 +76,8 @@ getInput win = do
       y1n = if y1 then 1 else 0
   return (x0n + x1n, y0n + y1n, j)
 
-processInput :: Player -> K.Window -> IO Player
-processInput player win = do
+processInput :: Player -> Bool -> K.Window -> IO (Bool, Player)
+processInput player lj win = do
   (xi, yi, j) <- liftIO $ getInput win
   let (x,y) = pos player
       (x',y') = (appVecs cos fv' x, appVecs sin fv' y)
@@ -94,20 +93,16 @@ processInput player win = do
                 (if st p'' == Air then addVect (FVector grav (3*pi/2) Gravity) (fv p'')
                                   else fv p''))-}
   --putStrLn $ show $ exstV JInput (fv p'')
-  return (Player (spawn player) (fst $ pos p'', if j && st p'' == Ground then snd (pos p'')+0.5 else snd $ pos p'') 0
-                 (if st p'' == Air then if exstV JInput (fv p'') && not j
-                                        then opVect (*) (FVector 0.95 (pi/2) JInput) $ addVect (FVector grav (3*pi/2) Gravity) (fv p'')
-                                        else addVect (FVector grav (3*pi/2) Gravity) (fv p'')
-                                   else if j then addVect (FVector 0.6 (pi/2) JInput) (fv p'')
-                                   else fv p'') (st p''))
+  return (j, Player (spawn player) (fst $ pos p'', if (not lj) && j && st p'' == Ground then snd (pos p'')+0.5 else snd $ pos p'') 0
+                    (chkJmps p'' lj j) (st p''))
 
-runGame player win = runGame' player win (0::Int)
-runGame' player win acc = do
-  altPlayer <- processInput player win
+--runGame player win = runGame' player win (0::Int)
+runGame player lj win = do
+  (j,altPlayer) <- processInput player lj win
   K.pollEvents
   drawScene altPlayer win
   K.swapBuffers win
-  runGame' altPlayer win (acc + 1)
+  runGame altPlayer j win
 
 main = do
   True <- K.init
@@ -118,4 +113,4 @@ main = do
   K.setFramebufferSizeCallback win (Just resizeScene)
   K.setWindowCloseCallback win (Just shutdown)
   initGL win
-  runGame player win
+  runGame player False win
