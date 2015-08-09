@@ -57,5 +57,5 @@ chkJmps p lj j =
   if st p == Air then if exstV JInput (fv p) && not j
     then opVect (*) (FVector 0.95 (pi/2) JInput) $ addVect (FVector grav (3*pi/2) Gravity) (fv p)
     else addVect (FVector grav (3*pi/2) Gravity) (fv p)
-  else if j then addVect (FVector 0.6 (pi/2) JInput) (fv p)
+  else if j then addVect (FVector 0.7 (pi/2) JInput) (fv p)
   else fv p

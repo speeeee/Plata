@@ -5,6 +5,7 @@ import Control.Monad.IO.Class (liftIO)
 import Control.Concurrent (threadDelay)
 import Data.Bits ( (.|.) )
 import System.Exit (exitWith, ExitCode(..))
+import System.Random (randomIO)
 
 import Core.Physics
 import Core.Hitbox
@@ -21,8 +22,8 @@ ln2 = Line (24,4) (24,10)
 ln3 = Line (24,10) (30,10)
 ln4 = Line (0,22) (10,22)
 
-yLns = [Line (3,4) (30,4), Line (0,22) (10,22), Line (24,10) (30,10)]
-xLns = [Line (24,4) (24,9.99)]
+yLns = [Line (2,4) (30,4), Line (0,22) (10,22), Line (23,14) (30,14)]
+xLns = [Line (23,4) (23,13.99)]
 
 initGL win = do
   glShadeModel gl_SMOOTH
@@ -45,10 +46,10 @@ drawScene player _ = do
   glTranslatef (-x) (-y) 0
   glBegin gl_QUADS
   glColor3f 1 1 1
-  mapM_ (\(x,y,z) -> glVertex3f x y z) [(x,y,0),(x+1,y,0),(x+1,y+1.6,0),(x,y+1.6,0)]
+  mapM_ (\(x,y,z) -> glVertex3f x y z) [(x,y,0),(x+2,y,0),(x+2,y+3.2,0),(x,y+3.2,0)]
   glColor3f 1 0 0
   mapM_ (\(x,y,z) -> glVertex3f x y z) [(4,0,0),(4,4,0),(30,4,0),(30,0,0),
-                                        (25,4,0),(25,10,0),(30,10,0),(30,4,0)]
+                                        (25,4,0),(25,14,0),(30,14,0),(30,4,0)]
   glEnd
 
 shutdown :: K.Window -> IO ()
