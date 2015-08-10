@@ -1,9 +1,10 @@
 module Core.Hitbox (testLine,testLineY,testLineX,Line(..),pHitY,pHitX,Player(..),PState(..),
-                    hbToLs,testLinesY,testLinesX,chkJmps) where
+                    testLinesY,testLinesX,chkJmps,xLn,yLn) where
 
 import Graphics.Rendering.OpenGL.Raw
 
 import Core.Physics
+import Data.Tuple
 
 data PState = Ground | Air | None deriving (Show,Eq)
 data Player = Player { spawn :: (GLfloat,GLfloat),
@@ -14,14 +15,23 @@ data Player = Player { spawn :: (GLfloat,GLfloat),
 data Line = Line { pta :: (GLfloat,GLfloat),
                    ptb :: (GLfloat,GLfloat) } deriving (Show,Eq)
 
-data Hitbox = Hitbox { pa :: (GLfloat,GLfloat),
-                       pb :: (GLfloat,GLfloat) } deriving (Show,Eq)
+--data Hitbox = Hitbox { pa :: (GLfloat,GLfloat),
+--                       pb :: (GLfloat,GLfloat) } deriving (Show,Eq)
+type Hitbox = ((GLfloat,GLfloat),(GLfloat,GLfloat))
+
+psz = 2
+         -- const   -> point-a -> point-b
+xLn, yLn :: GLfloat -> GLfloat -> GLfloat -> Line
+xLn x pa = lc (x,pa) . ((,) x)
+yLn y pa = lc (pa,y) . (swap . (,) y)
+
+lc a b = Line a b
 
 -- makes lines for side-specific hitboxes.
-hbToLs hb = ([Line (fst $ pa hb, snd $ pa hb) (fst $ pb hb, snd $ pa hb),
+{-hbToLs hb = ([Line (fst $ pa hb, snd $ pa hb) (fst $ pb hb, snd $ pa hb),
               Line (fst $ pa hb, snd $ pb hb) (fst $ pb hb, snd $ pb hb)],
              [Line (fst $ pa hb, snd $ pa hb) (fst $ pa hb, snd $ pb hb),
-              Line (fst $ pb hb, snd $ pa hb) (fst $ pb hb, snd $ pb hb)])
+              Line (fst $ pb hb, snd $ pa hb) (fst $ pb hb, snd $ pb hb)])-}
 
 testLinesY o p grav = foldl (hitY o grav) p
 hitY o grav p ln = pHitY (st p) (spawn p) o (fst $ pos p, snd $ pos p) ln grav (fv p)
