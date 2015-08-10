@@ -9,6 +9,7 @@ import System.Random (randomIO)
 
 import Core.Physics
 import Core.Hitbox
+import Util.MapGen
 
 {-: reshape ( w h -- )
    [ 0 0 ] 2dip glViewport GL_PROJECTION glMatrixMode
@@ -48,8 +49,9 @@ drawScene player _ = do
   glColor3f 1 1 1
   mapM_ (\(x,y,z) -> glVertex3f x y z) [(x,y,0),(x+2,y,0),(x+2,y+3.2,0),(x,y+3.2,0)]
   glColor3f 1 0 0
-  mapM_ (\(x,y,z) -> glVertex3f x y z) [(4,0,0),(4,4,0),(30,4,0),(30,0,0),
-                                        (25,4,0),(25,14,0),(30,14,0),(30,4,0)]
+  {-mapM_ (\(x,y,z) -> glVertex3f x y z) [(4,0,0),(4,4,0),(30,4,0),(30,0,0),
+                                        (25,4,0),(25,14,0),(30,14,0),(30,4,0)]-}
+  mapM_ (\(x,y) -> glVertex3f x y 0) $ snd rooms
   glEnd
 
 shutdown :: K.Window -> IO ()
@@ -88,7 +90,7 @@ processInput player lj win = do
       p' = pHitY (st p) (spawn player) (x,y) (pos p) ln3 grav (fv p)
       p'' = pHitY (st p') (spawn player) (x,y) (pos p') ln4 grav (fv p')
       p'' = testLinesY (x,y) (Player (spawn player) (x',y') 0 fv' Air) grav yLns-}
-      p'' = testLinesX (x,y) (testLinesY (x,y) (Player (spawn player) (x',y') 0 fv' Air) grav yLns) xLns
+      p'' = testLinesX (x,y) (testLinesY (x,y) (Player (spawn player) (x',y') 0 fv' Air) grav (snd $ fst $ rooms)) (fst $ fst rooms)
   putStrLn (show fv')
   {-return (pHitX (st p'') (spawn player) (x,y) (pos p'') ln2
                 (if st p'' == Air then addVect (FVector grav (3*pi/2) Gravity) (fv p'')
